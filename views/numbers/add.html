@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Add Number</title>
+</head>
+<body>
+    <div id="app">
+        <form @submit.prevent="saveNumber">
+            <div>
+                <label>Nama:</label>
+                <input type="text" name="nama" v-model="number.nama">
+            </div>
+            <div>
+                <label>Nomor HP:</label>
+                <input type="tel" name="nomor" v-model="number.nomor">
+            </div>
+            <div>
+                <label>Grup:</label>
+                <select name="grup" v-model="number.id_group">
+                    <option v-for="(group, index) of groups" :value="group.id">{{ group.nama }}</option>
+                </select>
+            </div>
+            <input type="button" value="Simpan" @click="saveNumber">
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.21/dist/vue.js"></script>
+    <script src="/js/numbers/add.js"></script>
+</body>
+</html>
