@@ -1,17 +1,16 @@
 const index = new Vue({
     el: '#app',
     data: {
-        numbers: [],
-        groups:  [],
-        number: {},
+        templates: [],
+        template: {},
         open: false
     },
     mounted: function () {
-        this.listNumbers();
+        this.listTemplates();
     },
     computed: {
         headerModal: function () {
-            if (this.number.id) {
+            if (this.template.id) {
                 return "Ubah"
             } else {
                 return "Tambah"
@@ -19,16 +18,16 @@ const index = new Vue({
         }
     },
     methods: {
-        listNumbers: function () {
-            fetch('/api/listNumbers')
+        listTemplates: function () {
+            fetch('/api/listTemplates')
             .then((res) => { return res.json() })
-            .then((data) => { this.numbers = data.data })
+            .then((data) => { this.templates = data.data })
             .catch((err) => console.error(err));
         },
-        deleteNumber: function (id) {
+        deleteTemplate: function (id) {
             const cnf = confirm('Hapus data?');
             if (cnf) {
-                fetch('/api/deleteNumber', {
+                fetch('/api/deleteTemplate', {
                     method: 'delete',
                     headers: {
                         'Content-Type': 'application/json'
@@ -38,59 +37,51 @@ const index = new Vue({
                 .then((res) => {
                     console.log(res);
                     alert('Terhapus');
-                    this.listNumbers();
+                    this.listTemplates();
                 })
                 .catch((error) => console.error(error));
             }
         },
         toggleForm: function () {
-            this.listGroups();
             this.open = !this.open;
-            if (!this.open) { this.number = {} }
+            if (!this.open) { this.template = {} }
         },
-        editNumber: function (id) {
-            this.listGroups();
-            fetch('/api/getNumber/' + id)
+        editTemplate: function (id) {
+            fetch('/api/getTemplate/' + id)
             .then((res) => { return res.json() })
-            .then((data) => { this.number = data.data[0] })
+            .then((data) => { this.template = data.data[0] })
             .catch((err) => console.error(err));
             this.open = !this.open;
         },
-        listGroups: function () {
-            fetch('/api/listGroups')
-            .then((res) => { return res.json() })
-            .then((data) => { this.groups = data.data })
-            .catch((err) => console.error(err));
-        },
-        saveNumber: function (id) {
+        saveTemplate: function (id) {
             if (id) {
-                fetch('/api/updateNumber', {
+                fetch('/api/updateTemplate', {
                     method: 'put',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(this.number)
+                    body: JSON.stringify(this.template)
                 })
                 .then((res) => {
                         console.log(res);
-                        this.number = {};
+                        this.template = {};
                         this.open = !this.open;
-                        this.listNumbers();
+                        this.listTemplates();
                     })
                 .catch((error) => console.error(error));
             } else {
-                fetch('/api/saveNumber', {
+                fetch('/api/saveTemplate', {
                     method: 'post',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(this.number)
+                    body: JSON.stringify(this.template)
                 })
                 .then((res) => {
                         console.log(res);
-                        this.number = {};
+                        this.template = {};
                         this.open = !this.open;
-                        this.listNumbers();
+                        this.listTemplates();
                     })
                 .catch((error) => console.error(error));
             }

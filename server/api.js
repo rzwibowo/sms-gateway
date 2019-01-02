@@ -90,9 +90,68 @@ router.get('/listGroups', (req, res) => {
     });
 });
 
+router.get('/listAnggotaGroups', (req, res) => {
+    connection.query(`SELECT n.id, n.nama, n.nomor, 
+        g.id as id_group, g.nama as nama_group
+        FROM numbers n
+        JOIN groups g
+        ON n.id_group = g.id`, function (err, result) {
+        if (err) throw err;
+        const data = result;
+        res.status(200).send({
+            success: 'true',
+            data: data
+        })
+    });
+});
+
+router.get('/getGroup/:group_id', (req, res) => {
+    connection.query(`SELECT *
+        FROM groups
+        WHERE id = ?`,
+        [req.params.group_id],
+        function (err, result) {
+        if (err) throw err;
+        const data = result;
+        res.status(200).send({
+            success: 'true',
+            data: data
+        })
+    });
+});
+
+router.get('/getAnggotaGroup/:group_id', (req, res) => {
+    connection.query(`SELECT n.id, n.nama, n.nomor, 
+        g.id as id_group, g.nama as nama_group
+        FROM numbers n
+        JOIN groups g
+        ON n.id_group = g.id
+        WHERE g.id = ?`,
+        [req.params.group_id],
+        function (err, result) {
+        if (err) throw err;
+        const data = result;
+        res.status(200).send({
+            success: 'true',
+            data: data
+        })
+    });
+});
+
 router.post('/saveGroup', (req, res) => {
     connection.query("INSERT INTO groups (nama) VALUES (?)", 
         [req.body.nama],
+        function (err, result) {
+            if (err) console.error(err);
+            res.status(200).send({
+                success: 'true'
+            })
+        });
+});
+
+router.put('/saveAnggotaGroup', (req, res) => {
+    connection.query("UPDATE numbers SET id_group = ? WHERE id = ?", 
+        [req.body.id_group, req.body.id],
         function (err, result) {
             if (err) console.error(err);
             res.status(200).send({
@@ -133,6 +192,21 @@ router.get('/listTemplates', (req, res) => {
             success: 'true',
             data: data
         })
+    });
+});
+
+router.get('/getTemplate/:template_id', (req, res) => {
+    connection.query(`SELECT *
+        FROM templates
+        WHERE id = ?`,
+        [req.params.template_id],
+        function (err, result) {
+            if (err) throw err;
+            const data = result;
+            res.status(200).send({
+                success: 'true',
+                data: data
+            })
     });
 });
 

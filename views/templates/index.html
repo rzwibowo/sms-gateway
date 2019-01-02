@@ -5,7 +5,7 @@
             <div class="hero-body">
                 <div class="container">
                     <h1 class="title">
-                        Daftar Nomor
+                        Daftar Pola Pesan
                     </h1>
                 </div>
             </div>
@@ -16,22 +16,20 @@
                 <table class="table is-hoverable">
                     <thead>
                         <tr>
-                            <th>Nama</th>
-                            <th>Nomor</th>
-                            <th>Anggota dari Grup</th>
+                            <th>Judul</th>
+                            <th>Isi</th>
                             <th>Opsi</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(number, index) of numbers" :key="index">
-                            <td>{{ number.nama }}</td>
-                            <td>{{ number.nomor }}</td>
-                            <td>{{ number.nama_group }}</td>
+                        <tr v-for="(template, index) of templates" :key="index">
+                            <td>{{ template.judul }}</td>
+                            <td>{{ template.teks }}</td>
                             <td>
-                                <button class="button is-text" @click="editNumber(number.id)" title="Ubah">
+                                <button class="button is-text" @click="editTemplate(template.id)" title="Ubah">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button class="button is-text has-text-danger" href="#" @click="deleteNumber(number.id)" title="Hapus">
+                                <button class="button is-text has-text-danger" href="#" @click="deleteTemplate(template.id)" title="Hapus">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </td>
@@ -42,7 +40,7 @@
                     <div class="control">
                         <button @click="toggleForm" class="button is-primary">
                             <span class="icon is-small"> <i class="fas fa-plus"></i> </span>
-                            <span> Tambah Nomor </span>
+                            <span> Tambah Pola Pesan </span>
                         </button>
                     </div>
                 </div>
@@ -53,44 +51,34 @@
             <div class="modal-background"></div>
             <div class="modal-card">
                 <header class="modal-card-head">
-                    <p class="modal-card-title">{{ headerModal }} Nomor</p>
+                    <p class="modal-card-title">{{ headerModal }} Pola Pesan</p>
                     <button class="delete" aria-label="close" @click="toggleForm"></button>
                 </header>
                 <section class="modal-card-body">
                     <form>
                         <div class="field">
-                            <label class="label">Nama:</label>
+                            <label class="label">Judul:</label>
                             <div class="control">
-                                <input class="input" type="text" name="nama" v-model="number.nama" style="width: 30em">
+                                <input class="input" type="text" name="judul" v-model="template.judul" style="width: 30em">
                             </div>
                         </div>
                         <div class="field">
-                            <label class="label">Nomor HP:</label>
+                            <label class="label">Teks:</label>
                             <div class="control">
-                                <input class="input" type="tel" name="nomor" v-model="number.nomor" style="width: 15em">
-                            </div>
-                        </div>
-                        <div class="field">
-                            <label class="label">Grup:</label>
-                            <div class="control">
-                                <div class="select">
-                                    <select name="grup" v-model="number.id_group">
-                                        <option v-for="(group, index) of groups" :value="group.id">{{ group.nama }}</option>
-                                    </select>
-                                </div>
+                                <textarea class="input" name="teks" v-model="template.teks" cols="30" rows="3"></textarea>
                             </div>
                         </div>
                     </form>
                 </section>
                 <footer class="modal-card-foot" style="justify-content: flex-end">
                     <button class="button" @click="toggleForm">Batal</button>
-                    <button class="button is-primary" type="button" @click="saveNumber(number.id)">Simpan</button>
+                    <button class="button is-primary" type="button" @click="saveTemplate(template.id)">Simpan</button>
                 </footer>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.21/dist/vue.js"></script>
-    <script src="/js/numbers/index.js"></script>
+    <script src="/js/templates/index.js"></script>
 
 <% include ../_layout/footer.html %>

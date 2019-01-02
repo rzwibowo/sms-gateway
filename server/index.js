@@ -38,6 +38,10 @@ const numbersRoute = require(__dirname + '/../views/numbers/route.js');
 app.use('/numbers', numbersRoute);
 app.use('/numbers', express.static(__dirname + '/../public'));
 
+const templatesRoute = require(__dirname + '/../views/templates/route.js');
+app.use('/templates', templatesRoute);
+app.use('/templates', express.static(__dirname + '/../public'));
+
 app.get('/', (req, res) => {
     res.render('index');
 });
