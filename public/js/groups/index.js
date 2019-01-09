@@ -112,7 +112,7 @@ const index = new Vue({
                     await this.updateGroupMember(1, this.unselected[i]);
                 }
             } else {
-                fetch('/api/saveGroup', {
+                await fetch('/api/saveGroup', {
                     method: 'post',
                     headers: {
                         'Content-Type': 'application/json'

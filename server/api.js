@@ -191,13 +191,13 @@ router.post('/saveGroup', async (req, res) => {
             if (err) console.error(err);
             res.status(200).send({
                 success: 'true',
-                last_id: result.id
+                last_id: result[0].id
             })
         })
 });
 
 router.put('/saveAnggotaGroup', (req, res) => {
-    connection.query("UPDATE numbers SET id_group = ? WHERE id IN (?)", 
+    connection.query("UPDATE numbers SET id_group = ? WHERE id = ?", 
         [req.body.id_group, req.body.id],
         function (err, result) {
             if (err) console.error(err);
