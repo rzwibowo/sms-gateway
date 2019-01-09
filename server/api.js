@@ -90,18 +90,36 @@ router.get('/listGroups', (req, res) => {
     });
 });
 
-router.get('/listAnggotaGroups', (req, res) => {
-    connection.query(`SELECT n.id, n.nama, n.nomor, 
-        g.id as id_group, g.nama as nama_group
+router.get('/listAnggotaGroups', async (req, res) => {
+    let r1, r2, r3 = [];
+    await connection.query("SELECT * FROM groups", function (err, result) {
+        if (err) throw err;
+        r1 = result;
+    });
+    await connection.query(`SELECT n.id, n.nama, n.nomor, n.id_group
         FROM numbers n
         JOIN groups g
-        ON n.id_group = g.id`, function (err, result) {
+        ON n.id_group = g.id
+        ORDER BY g.id`, function (err, result) {
         if (err) throw err;
-        const data = result;
+        r2 = result;
+
+        r1.forEach((g, idx) => {
+            r3[idx] = {};
+            r3[idx].id = g.id;
+            r3[idx].nama_group = g.nama;
+            r3[idx].members = [];
+            r2.forEach(m => {
+                if (m.id_group === g.id) {
+                    r3[idx].members.push(m);
+                }
+            })
+        });
+        
         res.status(200).send({
             success: 'true',
-            data: data
-        })
+            data: r3
+        });
     });
 });
 
@@ -120,8 +138,16 @@ router.get('/getGroup/:group_id', (req, res) => {
     });
 });
 
-router.get('/getAnggotaGroup/:group_id', (req, res) => {
-    connection.query(`SELECT n.id, n.nama, n.nomor, 
+router.get('/getAnggotaGroup/:group_id', async (req, res) => {
+    let r1, r2, r3 = [];
+    await connection.query(`SELECT * FROM groups
+        WHERE id = ?`,
+        [req.params.group_id],
+        function (err, result) {
+            if (err) throw err;
+            r1 = result;
+    });
+    await connection.query(`SELECT n.id, n.nama, n.nomor, 
         g.id as id_group, g.nama as nama_group
         FROM numbers n
         JOIN groups g
@@ -130,27 +156,48 @@ router.get('/getAnggotaGroup/:group_id', (req, res) => {
         [req.params.group_id],
         function (err, result) {
         if (err) throw err;
-        const data = result;
+        r2 = result;
+
+        r1.forEach((g, idx) => {
+            r3[idx] = {};
+            r3[idx].id = g.id;
+            r3[idx].nama_group = g.nama;
+            r3[idx].members = [];
+            r2.forEach(m => {
+                if (m.id_group === g.id) {
+                    r3[idx].members.push(m);
+                }
+            })
+        });
+        
         res.status(200).send({
             success: 'true',
-            data: data
-        })
+            data: r3
+        });
     });
 });
 
-router.post('/saveGroup', (req, res) => {
-    connection.query("INSERT INTO groups (nama) VALUES (?)", 
-        [req.body.nama],
+router.post('/saveGroup', async (req, res) => {
+    await connection.query("INSERT INTO groups (nama) VALUES (?)", 
+        [req.body.nama_group],
+        function (err, result) {
+            if (err) console.error(err);
+        });
+    connection.query(`SELECT id FROM groups
+        WHERE timestamp =
+        (SELECT MAX(timestamp)
+         FROM groups)`,
         function (err, result) {
             if (err) console.error(err);
             res.status(200).send({
-                success: 'true'
+                success: 'true',
+                last_id: result.id
             })
-        });
+        })
 });
 
 router.put('/saveAnggotaGroup', (req, res) => {
-    connection.query("UPDATE numbers SET id_group = ? WHERE id = ?", 
+    connection.query("UPDATE numbers SET id_group = ? WHERE id IN (?)", 
         [req.body.id_group, req.body.id],
         function (err, result) {
             if (err) console.error(err);
@@ -162,7 +209,7 @@ router.put('/saveAnggotaGroup', (req, res) => {
 
 router.put('/updateGroup', (req, res) => {
     connection.query("UPDATE groups SET nama = ? WHERE id = ?", 
-        [req.body.nama, req.body.id],
+        [req.body.nama_group, req.body.id],
         function (err, result) {
             if (err) console.error(err);
             res.status(200).send({
@@ -172,14 +219,19 @@ router.put('/updateGroup', (req, res) => {
 });
 
 router.delete('/deleteGroup', (req, res) => {
-    connection.query("DELETE FROM groups WHERE id = ?", 
-        [req.body.id],
-        function (err, result) {
-            if (err) console.error(err);
-            res.status(200).send({
-                success: 'true'
+    req.body.id === 1
+        ? res.status(403).send({
+                success: 'false',
+                message: 'restricted to delete'
             })
-        });
+        : connection.query("DELETE FROM groups WHERE id = ?", 
+            [req.body.id],
+            function (err, result) {
+                if (err) console.error(err);
+                res.status(200).send({
+                    success: 'true'
+                })
+            });
 });
 //#endregion GROUPS data operation
 

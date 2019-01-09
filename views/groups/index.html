@@ -11,93 +11,91 @@
             </div>
         </section>
             
-        <div class="columns is-centered">
-            <div class="column is-narrow">
-                <!-- <div class="box" v-for="(group_i, index) of groupsmember" :key="index">
+        <div class="columns is-multiline">
+            <div class="column is-narrow" v-for="g of groupsmember">
+                <div class="box">
                     <article class="media">
                         <div class="media-content">
                             <div class="content">
                                 <p>
-                                    <strong>{{ group_i.nama }}</strong> <small>{{ group_i.total }} anggota</small>
+                                    <strong>{{ g.nama_group }}</strong> <small>{{ g.members.length }} anggota</small>
                                 </p>    
                                 <ul>
-                                    <li v-for="(member, index_m) of group_i.members" :key="index_m">
-                                        {{ member.nama }} <small>{{ member.nomor }}</small>
+                                    <li v-for="m of g.members">
+                                        {{ m.nama }} <small>{{ m.nomor }}</small>
                                     </li>
                                 </ul>
                             </div>
-                            <nav class="level is-mobile">
-                                <div class="level-left">
-                                    <a class="level-item" aria-label="reply">
-                                        <span class="icon is-small">
-                                        <i class="fas fa-reply" aria-hidden="true"></i>
-                                        </span>
-                                    </a>
-                                    <a class="level-item" aria-label="retweet">
-                                        <span class="icon is-small">
-                                        <i class="fas fa-retweet" aria-hidden="true"></i>
-                                        </span>
-                                    </a>
-                                    <a class="level-item" aria-label="like">
-                                        <span class="icon is-small">
-                                        <i class="fas fa-heart" aria-hidden="true"></i>
-                                        </span>
-                                    </a>
+                            <nav class="level is-mobile" v-if="g.id !== 1">
+                                <div class="level-left"></div>
+                                <div class="level-right">
+                                    <button class="level-item button is-text" @click="editGroup(g.id)" title="Ubah">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="level-item button is-text has-text-danger" href="#" @click="deleteGrup(g.id)" title="Hapus">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 </div>
                             </nav>
                         </div>
                     </article>
-                </div> -->
-
-                <div v-for="(grp, idx) of groupsmember" :key="idx">
-                    {{grp.nama}} {{grp.total}}
-                    <!-- <span v-for="(mbr, idx2) in grp.members" :key="idx2">{{mbr.nama}}</span> -->
-                    <ul>
-                        <li v-for="(mbr, idx2) in grp.members" :key="idx2">{{mbr.nama}}</li>
-                    </ul>
                 </div>
-
-                
+            </div>
+            <div class="column">
                 <div class="field is-grouped is-grouped-right">
                     <div class="control">
                         <button @click="toggleForm" class="button is-primary">
                             <span class="icon is-small"> <i class="fas fa-plus"></i> </span>
-                            <span> Tambah Pola Pesan </span>
+                            <span> Tambah Grup </span>
                         </button>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- <div class="modal" :class="{ 'is-active': open }">
+        <div class="modal" :class="{ 'is-active': open }">
             <div class="modal-background"></div>
             <div class="modal-card">
                 <header class="modal-card-head">
-                    <p class="modal-card-title">{{ headerModal }} Pola Pesan</p>
+                    <p class="modal-card-title is-3">{{ headerModal }} Grup</p>
                     <button class="delete" aria-label="close" @click="toggleForm"></button>
                 </header>
                 <section class="modal-card-body">
                     <form>
                         <div class="field">
-                            <label class="label">Judul:</label>
+                            <label class="label">Nama Grup:</label>
                             <div class="control">
-                                <input class="input" type="text" name="judul" v-model="template.judul" style="width: 30em">
+                                <input class="input" type="text" name="nama_group" v-model="groupmember.nama_group" style="width: 30em">
                             </div>
                         </div>
-                        <div class="field">
-                            <label class="label">Teks:</label>
-                            <div class="control">
-                                <textarea class="input" name="teks" v-model="template.teks" cols="30" rows="3"></textarea>
-                            </div>
+                        <div class="field" v-if="headerModal === 'Ubah'" v-for="ms in groupmember.members">
+                            <label class="checkbox">
+                                <input type="checkbox"
+                                    v-model="selected"
+                                    :value="ms.id">
+                                {{ ms.nama }}
+                                <small>{{ ms.nomor }}</small>
+                            </label>
+                        </div>
+                        <h4 class="title is-4">Tambah Anggota dari:</h4>
+                        <h6 class="subtitle is-6">{{ groupno.nama_group }}</h6>
+                        <div class="field" v-for="mx in groupno.members">
+                            <label class="checkbox">
+                                <input type="checkbox"
+                                    v-model="selected" 
+                                    :value="mx.id">
+                                {{ mx.nama }}
+                                <small>{{ mx.nomor }}</small>
+                            </label>
                         </div>
                     </form>
                 </section>
                 <footer class="modal-card-foot" style="justify-content: flex-end">
                     <button class="button" @click="toggleForm">Batal</button>
-                    <button class="button is-primary" type="button" @click="saveTemplate(template.id)">Simpan</button>
+                    <button class="button is-primary" type="button" @click="saveGroup(groupmember.id)">Simpan</button>
                 </footer>
             </div>
-        </div> -->
+        </div>
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/vue@2.5.21/dist/vue.js"></script>

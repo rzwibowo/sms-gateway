@@ -2,108 +2,168 @@ const index = new Vue({
     el: '#app',
     data: {
         groupsmember: [],
-        group: {},
+        groupmember: {},
+        groupno: [],
+        selected: [],
+        unselected: [],
+        lastid: null,
         open: false
     },
     mounted: function () {
         this.listGroupsMember();
     },
     computed: {
-        // headerModal: function () {
-        //     if (this.template.id) {
-        //         return "Ubah"
-        //     } else {
-        //         return "Tambah"
-        //     }
-        // }
+        headerModal: function () {
+            if (this.groupmember.id) {
+                return "Ubah"
+            } else {
+                return "Tambah"
+            }
+        }
     },
     methods: {
-        listGroups: function () {
-            fetch('/api/listGroups')
-            .then((res) => { return res.json() })
-            .then((data) => { this.groupsmember = data.data })
-            .catch((err) => console.error(err));
-        },
         listGroupsMember: function () {
-            this.listGroups();
             fetch('/api/listAnggotaGroups')
             .then((res) => { return res.json() })
             .then((data) => {
-                this.groupsmember.forEach((g) => {
-                    g.members = [];
-                    g.total = 0;
-                    data.data.forEach((m) => {
-                        if (m.id_group === g.id) {
-                            g.members.push(m);
-                            g.total++;
-                        }
-                    }) 
-                });
-                console.log(this.groupsmember)
+                this.groupsmember = data.data;
+                this.listNoGroupMember();
             })
             .catch((err) => console.error(err));
         },
-        deleteTemplate: function (id) {
+        listNoGroupMember: function () {
+            this.groupno = this.groupsmember.filter(m => {
+                return m.id === 1
+            })[0];
+        },
+        deleteGroup: async function (id) {
             const cnf = confirm('Hapus data?');
             if (cnf) {
-                fetch('/api/deleteTemplate', {
-                    method: 'delete',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({id: id})
+                await fetch('/api/getAnggotaGroup/' + id)
+                .then((res) => { return res.json() })
+                .then((data) => {
+                    this.groupmember = data.data[0];
+                    this.groupmember.members.forEach(g => {
+                        this.selected.push(g.id);
+                    });
+
+                    return fetch('/api/deleteGroup', {
+                        method: 'delete',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({id: id})
+                    });
                 })
                 .then((res) => {
                     console.log(res);
-                    alert('Terhapus');
-                    this.listTemplates();
                 })
                 .catch((error) => console.error(error));
+                
+                for (let i = 0; i < this.selected.length; i++) {
+                    await this.updateGroupMember(1, this.selected[i]);
+                }
+                
+                alert('Terhapus');
+
+                this.emptyAll();
+                this.listGroupsMember();
             }
         },
         toggleForm: function () {
             this.open = !this.open;
-            if (!this.open) { this.template = {} }
+            if (!this.open) {
+                this.emptyAll();
+            }
         },
-        editTemplate: function (id) {
-            fetch('/api/getTemplate/' + id)
+        editGroup: function (id) {
+            fetch('/api/getAnggotaGroup/' + id)
             .then((res) => { return res.json() })
-            .then((data) => { this.template = data.data[0] })
+            .then((data) => {
+                this.groupmember = data.data[0];
+                this.groupmember.members.forEach(g => {
+                    this.selected.push(g.id);
+                });
+            })
             .catch((err) => console.error(err));
             this.open = !this.open;
         },
-        saveTemplate: function (id) {
+        saveGroup: async function (id) {
             if (id) {
-                fetch('/api/updateTemplate', {
+                await fetch('/api/updateGroup', {
                     method: 'put',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(this.template)
+                    body: JSON.stringify(this.groupmember)
                 })
                 .then((res) => {
-                        console.log(res);
-                        this.template = {};
-                        this.open = !this.open;
-                        this.listTemplates();
-                    })
+                    console.log(res);
+                })
                 .catch((error) => console.error(error));
+
+                for (let i = 0; i < this.selected.length; i++) {
+                    await this.updateGroupMember(id, this.selected[i]);
+                }
+
+                await this.notSelected();
+                
+                for (let i = 0; i < this.unselected.length; i++) {
+                    await this.updateGroupMember(1, this.unselected[i]);
+                }
             } else {
-                fetch('/api/saveTemplate', {
+                fetch('/api/saveGroup', {
                     method: 'post',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(this.template)
+                    body: JSON.stringify(this.groupmember)
                 })
+                .then((res) => { return res.json() })
                 .then((res) => {
-                        console.log(res);
-                        this.template = {};
-                        this.open = !this.open;
-                        this.listTemplates();
-                    })
+                    console.log(res);
+                    this.lastid = res.last_id;
+                })
                 .catch((error) => console.error(error));
+
+                for (let i = 0; i < this.selected.length; i++) {
+                    await this.updateGroupMember(this.lastid, this.selected[i]);
+                }
             }
+
+            this.emptyAll();
+
+            this.open = !this.open;
+            this.listGroupsMember();
+        },
+        updateGroupMember: function (gid, id) {
+            fetch('/api/saveAnggotaGroup', {
+                method: 'put',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id_group: gid,
+                    id: id
+                })
+            })
+            .then((res) => {
+                console.log(res);
+            })
+            .catch((error) => console.error(error));
+        },
+        notSelected: function () {
+            this.unselected = this.groupmember.members.filter(u => {
+                return this.selected.indexOf(u.id) < 0;
+            }).map(uu => {
+                return uu.id;
+            })
+        },
+        emptyAll: function() {
+            this.groupmember = {};
+            this.selected = [];
+            this.unselected = [];
+            this.lastid = null;
         }
     }
 });
