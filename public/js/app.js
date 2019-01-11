@@ -145,13 +145,14 @@ const index = new Vue({
             this.socket.on('connect', function () {
                 console.log('Socket connected');
             });
+            const this_ = this;
             this.socket.on('smsStatus', function (data) {
                 console.log(data);
                 if (!data) return;
                 if (data.error) {
-                    messageStatus('Error: ' + data.error, this.permission);
+                    this_.messageStatus('Error: ' + data.error, this.permission);
                 } else {
-                    messageStatus('Message ID ' + data.id + ' successfully sent to ' + data.number, this.permission);
+                    this_.messageStatus('Message ID ' + data.id + ' successfully sent to ' + data.number, this.permission);
                 }
             });
         },
@@ -202,11 +203,11 @@ const index = new Vue({
             })
             .then(function (response) {
                 if (response.status !== 200) {
-                    this.messageStatus(statusText, notification);
+                    this.messageStatus(statusText, this.permission);
                 }
             })
             .catch(function (e) {
-                this.messageStatus(e, notification);
+                this.messageStatus(e, this.permission);
             });
         }
     }
