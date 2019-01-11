@@ -1,23 +1,118 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Send Message</title>
-    <!-- <link rel="stylesheet" href="css/style.css"> -->
-</head>
-<body>
-    <form>
+<% include _layout/header.html %>
+
+    <div id="app">
+        <section class="hero is-light">
+            <div class="hero-body">
+                <div class="container">
+                    <h1 class="title">
+                        Kirim SMS
+                    </h1>
+                </div>
+            </div>
+        </section>
+
+        <div class="columns is-centered">
+            <div class="column is-narrow">
+                <form @submit.prevent="sendMessage">
+                    <h4 class="title is-4">Kirim ke: </h4>
+                    <div class="tile is-parent">
+                        <article class="tile is-child box">
+                            <div class="field">
+                                <label class="radio">
+                                    <input type="radio"
+                                        v-model="selectedtype"
+                                        value="g"
+                                        name="receiver-type"
+                                        checked="checked">
+                                    Grup
+                                </label>
+                            </div>
+                            <div class="field">
+                                <label class="radio">
+                                    <input type="radio"
+                                        v-model="selectedtype"
+                                        value="n"
+                                        name="receiver-type">
+                                    Personal
+                                </label>
+                            </div>
+                        </article>
+                    </div>
+                    <div class="tile is-parent">
+                        <article class="tile is-child box">
+                            <div style="max-height:10em;overflow-y:scroll;">
+                                <div class="field" v-show="selectedtype === 'g'"
+                                    v-for="g in groups">
+                                    <label class="radio">
+                                        <input type="radio"
+                                            :value="g.id"
+                                            name="group"
+                                            v-model="group">
+                                        {{ g.nama }}
+                                    </label>
+                                </div>
+                                <div class="field" v-show="selectedtype === 'n'"
+                                    v-for="n in numbers">
+                                    <label class="radio">
+                                        <input type="radio"
+                                            :value="n.nomor"
+                                            name="number"
+                                            v-model="number">
+                                        {{ n.nama }}
+                                        <small>{{ n.nomor }}</small>
+                                    </label>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+        
+                    <h4 class="title is-4">Isi pesan: </h4>
+                    <div class="tile is-parent">
+                        <article class="is-child box">
+                            <div class="select">
+                                <select name="template" v-model="message">
+                                    <option value="">Pilih template</option>
+                                    <option v-for="t in templates"
+                                        :value="t.teks">
+                                        {{ t.judul }}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <div class="control">
+                                    <textarea class="textarea"
+                                        placeholder="Ketikkan pesan ..."
+                                        v-model="message"></textarea>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+    
+                    <div class="field is-grouped is-grouped-right">
+                        <div class="control">
+                            <button class="button is-primary" type="submit" @click="sendMessage">
+                                <span class="icon is-small"> <i class="fas fa-forward"></i> </span>
+                                <span> Kirimkan </span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+
+    </div>
+
+    <!-- <form>
         <input type="tel" name="number" placeholder="+62 8xxx">
         <input type="text" name="text" placeholder="Selamat, Anda mendapatkan ...">
         <input type="button" value="Send SMS">
         <div id="list"></div>
         <input type="button" value="Massive Send">
     </form>
-    <p class="response"></p>
+    <p class="response"></p> -->
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="js/app.js"></script>
-</body>
-</html>
+
+<% include _layout/footer.html %>
