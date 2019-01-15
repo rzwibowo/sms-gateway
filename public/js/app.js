@@ -103,11 +103,16 @@ const index = new Vue({
         permission: 'denied'
     },
     mounted: function () {
-        this.checkPermission();
-        this.listGroups();
-        this.listNumbers();
-        this.listTemplates();
-        this.socketInteraction();
+        this.checkPermission().then((response) => {
+            this.permission = response;
+            console.log('Web notification status: ' + response);
+            this.listGroups();
+            this.listNumbers();
+            this.listTemplates();
+            this.socketInteraction();
+        }, (error) => {
+            console.error(error);
+        });
     },
     methods: {
         listGroups: function () {
@@ -129,17 +134,17 @@ const index = new Vue({
             .catch((err) => console.error(err));
         },
         checkPermission: function () {
-            try {
-                Notification.requestPermission().then(function(status) {
-                    this.permission = status;
-                    console.log('Web notification status: '+ this.permission);
-                });
-            } catch (error) { // Safari 9 doesn't return a promise for requestPermissions
-                Notification.requestPermission(function(status) {
-                    this.permission = status;
-                    console.log('Web notification status: '+ this.permission);
-                });
-            }
+            return new Promise((resolve, reject) => {
+                try {
+                    Notification.requestPermission().then(function (status) {
+                        resolve(status);
+                    });
+                } catch (error) {
+                    Notification.requestPermission(function (status) {
+                        resolve(status);
+                    });
+                }
+            });
         },
         socketInteraction: function () {
             this.socket.on('connect', function () {
@@ -150,9 +155,9 @@ const index = new Vue({
                 console.log(data);
                 if (!data) return;
                 if (data.error) {
-                    this_.messageStatus('Error: ' + data.error, this.permission);
+                    this_.messageStatus('Error: ' + data.error, this_.permission);
                 } else {
-                    this_.messageStatus('Message ID ' + data.id + ' successfully sent to ' + data.number, this.permission);
+                    this_.messageStatus('Message ID ' + data.id + ' successfully sent to ' + data.number, this_.permission);
                 }
             });
         },
@@ -191,6 +196,7 @@ const index = new Vue({
             this.groupmembernumber = [];
         },
         sendProcess: function (number, text) {
+            const this_ = this;
             fetch('/', {
                 method: 'post',
                 headers: {
@@ -203,11 +209,11 @@ const index = new Vue({
             })
             .then(function (response) {
                 if (response.status !== 200) {
-                    this.messageStatus(statusText, this.permission);
+                    this.messageStatus(response.statusText, this_.permission);
                 }
             })
             .catch(function (e) {
-                this.messageStatus(e, this.permission);
+                this.messageStatus(e, this_.permission);
             });
         }
     }
