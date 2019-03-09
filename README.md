@@ -2,4 +2,9 @@
 Simple web based SMS gateway app using Node JS and Nexmo
 
 ## development note
-There's some bug, please see issues
+Currently available feature:
+- Numbers management
+- Groups management
+- Template management
+
+Needed enhancement are listed on Issues
