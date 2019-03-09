@@ -1,0 +1,97 @@
+<% include ../_layout/header.html %>
+
+    <div id="app">
+        <section class="hero is-light">
+            <div class="hero-body">
+                <div class="container">
+                    <h1 class="title">
+                        Daftar Pengguna
+                    </h1>
+                </div>
+            </div>
+        </section>
+            
+        <div class="columns is-centered">
+            <div class="column is-narrow">
+                <table class="table is-hoverable">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Nama</th>
+                            <th>Email</th>
+                            <th>Opsi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(user, index) of users" :key="index">
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.nama }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                <button class="button is-text" @click="editUser(user.id)" title="Ubah">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="button is-text has-text-danger" href="#" @click="deleteUser(user.id)" title="Hapus">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="field is-grouped is-grouped-right">
+                    <div class="control">
+                        <button @click="toggleForm" class="button is-primary">
+                            <span class="icon is-small"> <i class="fas fa-plus"></i> </span>
+                            <span> Tambah Pengguna </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" :class="{ 'is-active': open }">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">{{ headerModal }} Pengguna</p>
+                    <button class="delete" aria-label="close" @click="toggleForm"></button>
+                </header>
+                <section class="modal-card-body">
+                    <form>
+                        <div class="field">
+                            <label class="label">Username:</label>
+                            <div class="control">
+                                <input class="input" type="text" name="username" v-model="user.username" style="width: 30em">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Nama:</label>
+                            <div class="control">
+                                <input class="input" type="text" name="nama" v-model="user.nama" style="width: 30em">                                
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Email:</label>
+                            <div class="control">
+                                <input class="input" type="email" name="email" v-model="user.email" style="width: 30em">                                
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Password:</label>
+                            <div class="control">
+                                <input class="input" type="password" name="password" v-model="user.password" style="width: 30em">                                
+                            </div>
+                        </div>
+                    </form>
+                </section>
+                <footer class="modal-card-foot" style="justify-content: flex-end">
+                    <button class="button" @click="toggleForm">Batal</button>
+                    <button class="button is-primary" type="button" @click="saveUser(user.id)">Simpan</button>
+                </footer>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/users/index.js"></script>
+
+<% include ../_layout/footer.html %>

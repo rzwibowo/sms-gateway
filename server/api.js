@@ -296,4 +296,68 @@ router.delete('/deleteTemplate', (req, res) => {
 });
 //#endregion TEMPLATES data operation
 
+//#region USERS data operation
+router.get('/listUsers', (req, res) => {
+    connection.query("SELECT id, username, nama, email FROM users",
+        function (err, result) {
+            if (err) throw err;
+            const data = result;
+            res.status(200).send({
+                success: 'true',
+                data: data
+            })
+        });
+});
+
+router.get('/getUser/:user_id', (req, res) => {
+    connection.query(`SELECT *
+        FROM users
+        WHERE id = ?`,
+        [req.params.user_id],
+        function (err, result) {
+            if (err) throw err;
+            const data = result;
+            res.status(200).send({
+                success: 'true',
+                data: data
+            })
+    });
+});
+
+router.post('/saveUser', (req, res) => {
+    connection.query(`INSERT INTO users (username, nama, email, password) 
+        VALUES (?, ?, ?, ?)`, 
+        [req.body.username, req.body.nama, req.body.email, req.body.password],
+        function (err, result) {
+            if (err) console.error(err);
+            res.status(200).send({
+                success: 'true'
+            })
+        });
+});
+
+router.put('/updateUser', (req, res) => {
+    connection.query(`UPDATE users SET username = ?, nama = ?, email = ?, password = ? 
+        WHERE id = ?`, 
+        [req.body.username, req.body.nama, req.body.email, req.body.password, req.body.id],
+        function (err, result) {
+            if (err) console.error(err);
+            res.status(200).send({
+                success: 'true'
+            })
+        });
+});
+
+router.delete('/deleteUser', (req, res) => {
+    connection.query("DELETE FROM users WHERE id = ?", 
+        [req.body.id],
+        function (err, result) {
+            if (err) console.error(err);
+            res.status(200).send({
+                success: 'true'
+            })
+        });
+});
+//#endregion USERS data operation
+
 module.exports = router;

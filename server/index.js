@@ -42,6 +42,10 @@ const templatesRoute = require(__dirname + '/../views/templates/route.js');
 app.use('/templates', templatesRoute);
 app.use('/templates', express.static(__dirname + '/../public'));
 
+const usersRoute = require(__dirname + '/../views/users/route.js');
+app.use('/users', usersRoute);
+app.use('/users', express.static(__dirname + '/../public'));
+
 app.get('/', (req, res) => {
     res.render('index');
 });
