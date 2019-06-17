@@ -1,14 +1,17 @@
 const express = require('express');
 const app = express();
-const server = app.listen(4000, () => console.log("App running on http://localhost:4000"));
+
+require('dotenv').config();
+
+const server = app.listen(process.env.PORT || 4000, () => console.log("App running"));
 
 const bodyParser = require('body-parser');
 const ejs = require('ejs');
 
 const Nexmo = require('nexmo')
 const nexmo = new Nexmo({
-    apiKey: 'ec379606',
-    apiSecret: 'zBOQJ108MtcClzgZ'
+    apiKey: process.env.API_KEY,
+    apiSecret: process.env.API_SECRET
 }, {debug: true});
 
 const socketIo = require('socket.io');
