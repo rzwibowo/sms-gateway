@@ -19,7 +19,7 @@ connection.connect(function (err) {
 //#region NUMBERS data operation
 router.get('/listNumbers', (req, res) => {
     connection.query(`SELECT n.id, n.nama, n.nomor, n.id_group, g.nama AS nama_group
-        FROM numbers n JOIN groups g ON n.id_group = g.id`,
+        FROM numbers n JOIN ngroups g ON n.id_group = g.id`,
         function (err, result) {
             if (err) throw err;
             const data = result;
@@ -33,7 +33,7 @@ router.get('/listNumbers', (req, res) => {
 router.get('/getNumber/:number_id', (req, res) => {
     connection.query(`SELECT n.id, n.nama, n.nomor, n.id_group, g.nama AS nama_group
         FROM numbers n
-        JOIN groups g
+        JOIN ngroups g
         ON n.id_group = g.id
         WHERE n.id = ?`,
         [req.params.number_id],
@@ -81,9 +81,9 @@ router.delete('/deleteNumber', (req, res) => {
 });
 //#endregion NUMBERS data operation
 
-//#region GROUPS data operation
+//#region NGROUPS data operation
 router.get('/listGroups', (req, res) => {
-    connection.query("SELECT * FROM groups", function (err, result) {
+    connection.query("SELECT * FROM ngroups", function (err, result) {
         if (err) throw err;
         const data = result;
         res.status(200).send({
@@ -95,13 +95,13 @@ router.get('/listGroups', (req, res) => {
 
 router.get('/listAnggotaGroups', async (req, res) => {
     let r1, r2, r3 = [];
-    await connection.query("SELECT * FROM groups", function (err, result) {
+    await connection.query("SELECT * FROM ngroups", function (err, result) {
         if (err) throw err;
         r1 = result;
     });
     await connection.query(`SELECT n.id, n.nama, n.nomor, n.id_group
         FROM numbers n
-        JOIN groups g
+        JOIN ngroups g
         ON n.id_group = g.id
         ORDER BY g.id`, function (err, result) {
         if (err) throw err;
@@ -128,7 +128,7 @@ router.get('/listAnggotaGroups', async (req, res) => {
 
 router.get('/getGroup/:group_id', (req, res) => {
     connection.query(`SELECT *
-        FROM groups
+        FROM ngroups
         WHERE id = ?`,
         [req.params.group_id],
         function (err, result) {
@@ -143,7 +143,7 @@ router.get('/getGroup/:group_id', (req, res) => {
 
 router.get('/getAnggotaGroup/:group_id', async (req, res) => {
     let r1, r2, r3 = [];
-    await connection.query(`SELECT * FROM groups
+    await connection.query(`SELECT * FROM ngroups
         WHERE id = ?`,
         [req.params.group_id],
         function (err, result) {
@@ -153,7 +153,7 @@ router.get('/getAnggotaGroup/:group_id', async (req, res) => {
     await connection.query(`SELECT n.id, n.nama, n.nomor, 
         g.id as id_group, g.nama as nama_group
         FROM numbers n
-        JOIN groups g
+        JOIN ngroups g
         ON n.id_group = g.id
         WHERE g.id = ?`,
         [req.params.group_id],
@@ -181,15 +181,15 @@ router.get('/getAnggotaGroup/:group_id', async (req, res) => {
 });
 
 router.post('/saveGroup', async (req, res) => {
-    await connection.query("INSERT INTO groups (nama) VALUES (?)", 
+    await connection.query("INSERT INTO ngroups (nama) VALUES (?)", 
         [req.body.nama_group],
         function (err, result) {
             if (err) console.error(err);
         });
-    connection.query(`SELECT id FROM groups
+    connection.query(`SELECT id FROM ngroups
         WHERE timestamp =
         (SELECT MAX(timestamp)
-         FROM groups)`,
+         FROM ngroups)`,
         function (err, result) {
             if (err) console.error(err);
             res.status(200).send({
@@ -211,7 +211,7 @@ router.put('/saveAnggotaGroup', (req, res) => {
 });
 
 router.put('/updateGroup', (req, res) => {
-    connection.query("UPDATE groups SET nama = ? WHERE id = ?", 
+    connection.query("UPDATE ngroups SET nama = ? WHERE id = ?", 
         [req.body.nama_group, req.body.id],
         function (err, result) {
             if (err) console.error(err);
@@ -227,7 +227,7 @@ router.delete('/deleteGroup', (req, res) => {
                 success: 'false',
                 message: 'restricted to delete'
             })
-        : connection.query("DELETE FROM groups WHERE id = ?", 
+        : connection.query("DELETE FROM ngroups WHERE id = ?", 
             [req.body.id],
             function (err, result) {
                 if (err) console.error(err);
@@ -236,7 +236,7 @@ router.delete('/deleteGroup', (req, res) => {
                 })
             });
 });
-//#endregion GROUPS data operation
+//#endregion NGROUPS data operation
 
 //#region TEMPLATES data operation
 router.get('/listTemplates', (req, res) => {
